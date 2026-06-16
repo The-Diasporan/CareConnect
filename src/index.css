@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --cream: 251 248 243;
+    --surface: 255 255 255;
+    --ink: 31 42 55;
+    --line: 0 0 0;
+    color-scheme: light;
+  }
+
+  .dark {
+    --cream: 17 20 24;
+    --surface: 30 35 41;
+    --ink: 237 240 244;
+    --line: 255 255 255;
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-cream text-ink antialiased;
+    font-feature-settings: "cv11", "ss01";
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-display tracking-tight;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand-500 ring-offset-2 ring-offset-cream;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply btn bg-brand-600 text-white shadow-soft hover:bg-brand-700 active:scale-[0.98];
+  }
+
+  .btn-secondary {
+    @apply btn bg-surface text-brand-700 ring-1 ring-inset ring-brand-200 hover:bg-brand-50 active:scale-[0.98] dark:text-brand-300 dark:hover:bg-brand-900/30;
+  }
+
+  .btn-warm {
+    @apply btn bg-warm-500 text-white shadow-soft hover:bg-warm-600 active:scale-[0.98];
+  }
+
+  .btn-ghost {
+    @apply btn text-ink/70 hover:bg-ink/5;
+  }
+
+  .card {
+    @apply rounded-2xl border border-line/5 bg-surface shadow-card dark:border-line/10;
+  }
+
+  .input {
+    @apply w-full rounded-xl border border-ink/15 bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink/40 transition focus:border-brand-500 focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-800;
+  }
+
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-ink/80;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-ink/15;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-ink/25;
+}
