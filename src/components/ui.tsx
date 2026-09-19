@@ -1,6 +1,15 @@
 import type { ReactNode } from "react";
 import type { ApplicationStatus, JobType } from "../types";
 import { StarIcon } from "./icons";
+import {
+  jobTypeLabel,
+  jobTypeTone,
+  statusLabel,
+  statusTone,
+  toneChip,
+  toneTile,
+  type Tone,
+} from "./theme";
 
 export function StarRating({
   value,
@@ -83,32 +92,20 @@ export function Avatar({
   );
 }
 
-const jobTypeStyles: Record<JobType, string> = {
-  "full-time": "bg-brand-50 text-brand-700 ring-1 ring-brand-200",
-  "part-time": "bg-blue-50 text-blue-700 ring-1 ring-blue-200",
-  "shift-based": "bg-violet-50 text-violet-700 ring-1 ring-violet-200",
-};
-
-const jobTypeLabel: Record<JobType, string> = {
-  "full-time": "Full-time",
-  "part-time": "Part-time",
-  "shift-based": "Shift-based",
-};
-
 export function JobTypeChip({ type }: { type: JobType }) {
-  return <span className={`chip ${jobTypeStyles[type]}`}>{jobTypeLabel[type]}</span>;
+  return <Chip tone={jobTypeTone[type]}>{jobTypeLabel[type]}</Chip>;
 }
 
 export function Chip({
   children,
+  tone = "neutral",
   className = "",
 }: {
   children: ReactNode;
+  tone?: Tone;
   className?: string;
 }) {
-  return (
-    <span className={`chip bg-ink/5 text-ink/70 ${className}`}>{children}</span>
-  );
+  return <span className={`chip ${toneChip[tone]} ${className}`}>{children}</span>;
 }
 
 export function SectionHeading({
@@ -126,7 +123,7 @@ export function SectionHeading({
     <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
       <div>
         {eyebrow && (
-          <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-brand-600">
+          <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">
             {eyebrow}
           </p>
         )}
@@ -150,7 +147,7 @@ export function EmptyState({
   return (
     <div className="card flex flex-col items-center justify-center gap-2 px-6 py-14 text-center">
       {icon && (
-        <div className="mb-1 flex h-12 w-12 items-center justify-center rounded-full bg-brand-50 text-brand-600">
+        <div className={`mb-1 flex h-12 w-12 items-center justify-center rounded-full ${toneTile.brand}`}>
           {icon}
         </div>
       )}
@@ -162,51 +159,7 @@ export function EmptyState({
   );
 }
 
-const statusStyles: Record<ApplicationStatus, string> = {
-  pending:
-    "bg-amber-50 text-amber-700 ring-1 ring-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:ring-amber-500/30",
-  reviewed:
-    "bg-blue-50 text-blue-700 ring-1 ring-blue-200 dark:bg-blue-500/15 dark:text-blue-300 dark:ring-blue-500/30",
-  interview:
-    "bg-violet-50 text-violet-700 ring-1 ring-violet-200 dark:bg-violet-500/15 dark:text-violet-300 dark:ring-violet-500/30",
-  hired:
-    "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-emerald-500/30",
-  declined:
-    "bg-ink/5 text-ink/55 ring-1 ring-ink/10",
-};
-
-const statusLabel: Record<ApplicationStatus, string> = {
-  pending: "Pending",
-  reviewed: "Reviewed",
-  interview: "Interview",
-  hired: "Hired",
-  declined: "Declined",
-};
-
-export const APPLICATION_STATUSES: ApplicationStatus[] = [
-  "pending",
-  "reviewed",
-  "interview",
-  "hired",
-  "declined",
-];
-
-export function statusText(status: ApplicationStatus): string {
-  return statusLabel[status];
-}
-
 export function StatusBadge({ status }: { status: ApplicationStatus }) {
-  return <span className={`chip ${statusStyles[status]}`}>{statusLabel[status]}</span>;
+  return <Chip tone={statusTone[status]}>{statusLabel[status]}</Chip>;
 }
 
-export function timeAgo(ts: number): string {
-  const diff = Date.now() - ts;
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return "just now";
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
-  const days = Math.floor(hrs / 24);
-  if (days < 30) return `${days}d ago`;
-  return new Date(ts).toLocaleDateString();
-}

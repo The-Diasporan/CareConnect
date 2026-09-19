@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useApp } from "../store/AppContext";
 import { Brand } from "../components/Layout";
+import { toneTile } from "../components/theme";
 import { ThemeToggle } from "../components/ThemeToggle";
 import {
   ArrowRightIcon,
@@ -104,7 +105,7 @@ export default function Landing() {
           </span>
           <h1 className="mx-auto max-w-3xl font-display text-4xl font-bold leading-tight text-ink sm:text-5xl md:text-6xl">
             Where great caregivers meet{" "}
-            <span className="text-brand-600">caring homes</span>.
+            <span className="text-brand-600 dark:text-brand-400">caring homes</span>.
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-ink/65 sm:text-lg">
             CareConnect is the dedicated marketplace for the senior care
@@ -187,7 +188,7 @@ export default function Landing() {
             },
           ].map((f) => (
             <div key={f.title} className="card p-6">
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+              <span className={`flex h-11 w-11 items-center justify-center rounded-xl ${toneTile.brand}`}>
                 {f.icon}
               </span>
               <h3 className="mt-3 font-display text-lg font-semibold text-ink">

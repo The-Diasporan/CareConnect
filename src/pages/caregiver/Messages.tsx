@@ -4,7 +4,7 @@ export default function CaregiverMessages() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wider text-brand-600">
+        <p className="text-xs font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">
           Caregiver dashboard
         </p>
         <h1 className="mt-1 font-display text-2xl font-bold text-ink sm:text-3xl">

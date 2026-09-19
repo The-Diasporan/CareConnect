@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { AFH, Job } from "../types";
 import { useApp } from "../store/AppContext";
 import { Avatar } from "./ui";
@@ -16,11 +16,71 @@ export function ApplyModal({
   const { applyToJob, session } = useApp();
   const [message, setMessage] = useState("");
 
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Callers pass an inline arrow for `onClose`, so its identity changes every
+  // render. Reading it through a ref keeps the effect below a true mount/unmount
+  // effect — otherwise it tears down and re-runs constantly, which re-captures
+  // the "previously focused" element from inside the dialog and never restores
+  // focus to the trigger.
+  const onCloseRef = useRef(onClose);
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    onCloseRef.current = onClose;
   }, [onClose]);
+
+  // Captured during the first render, before React commits `autoFocus` and
+  // moves focus into the panel — by the time an effect runs, `activeElement` is
+  // already the textarea, so reading it there would restore focus to a node
+  // that is about to be unmounted.
+  const triggerRef = useRef<HTMLElement | null>(
+    typeof document === "undefined"
+      ? null
+      : (document.activeElement as HTMLElement | null),
+  );
+
+  /**
+   * Keep focus inside the dialog while it is open, and stop the page behind it
+   * from scrolling. Without the trap, tabbing past the last control walks into
+   * the job board underneath — invisible to a sighted user, disorienting with a
+   * screen reader or keyboard.
+   */
+  useEffect(() => {
+    // Copied into the effect so the cleanup closes over a stable value.
+    const trigger = triggerRef.current;
+    const { overflow } = document.body.style;
+    document.body.style.overflow = "hidden";
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onCloseRef.current();
+        return;
+      }
+      if (e.key !== "Tab") return;
+
+      const focusable = panelRef.current?.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])',
+      );
+      if (!focusable?.length) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = overflow;
+      // Only worth restoring if the trigger is still on the page.
+      if (trigger?.isConnected) trigger.focus();
+    };
+  }, []);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,6 +97,7 @@ export function ApplyModal({
       onClick={onClose}
     >
       <div
+        ref={panelRef}
         className="card w-full max-w-lg animate-fade-in rounded-b-none p-6 sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
@@ -79,7 +140,10 @@ export function ApplyModal({
 
         <form onSubmit={submit} className="mt-5">
           <label className="label" htmlFor="apply-msg">
-            Message to the home {session ? `(from ${session.name})` : ""}
+            Message to the home{" "}
+            <span className="font-normal text-ink/45">
+              (optional{session ? ` — from ${session.name}` : ""})
+            </span>
           </label>
           <textarea
             id="apply-msg"

@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useApp } from "../store/AppContext";
-import { Avatar, EmptyState, StatusBadge, timeAgo } from "./ui";
+import { Avatar, EmptyState, StatusBadge } from "./ui";
+import { timeAgo } from "./format";
 import { ChatIcon, SendIcon } from "./icons";
-import type { Application, Role } from "../types";
+import type { Application, Message, Role } from "../types";
 
 function threadUnread(
   applicationId: string,
@@ -58,20 +59,30 @@ export function MessagesInbox({ role }: { role: Role }) {
   const active = threads.find((t) => t.id === activeId);
   const threadMessages = active ? messagesForApplication(active.id) : [];
 
+  /**
+   * Last message per thread, in one pass over `messages`.
+   *
+   * The previous version re-filtered the whole message list twice inside a sort
+   * comparator, and the list showed neither a preview nor a timestamp — two
+   * applications from the same person were indistinguishable.
+   */
+  const lastByThread = useMemo(() => {
+    const map = new Map<string, Message>();
+    for (const m of messages) {
+      const current = map.get(m.applicationId);
+      if (!current || m.sentAt > current.sentAt) map.set(m.applicationId, m);
+    }
+    return map;
+  }, [messages]);
+
   const sortedThreads = useMemo(
     () =>
-      [...threads].sort((a, b) => {
-        const aMsgs = messages.filter((m) => m.applicationId === a.id);
-        const bMsgs = messages.filter((m) => m.applicationId === b.id);
-        const aLast = aMsgs.length
-          ? Math.max(...aMsgs.map((m) => m.sentAt))
-          : a.appliedAt;
-        const bLast = bMsgs.length
-          ? Math.max(...bMsgs.map((m) => m.sentAt))
-          : b.appliedAt;
-        return bLast - aLast;
-      }),
-    [threads, messages],
+      [...threads].sort(
+        (a, b) =>
+          (lastByThread.get(b.id)?.sentAt ?? b.appliedAt) -
+          (lastByThread.get(a.id)?.sentAt ?? a.appliedAt),
+      ),
+    [threads, lastByThread],
   );
 
   const selectThread = (id: string) => {
@@ -142,6 +153,7 @@ export function MessagesInbox({ role }: { role: Role }) {
               readState,
             );
             const selected = app.id === activeId;
+            const last = lastByThread.get(app.id);
             return (
               <li key={app.id}>
                 <button
@@ -156,17 +168,25 @@ export function MessagesInbox({ role }: { role: Role }) {
                     size={40}
                   />
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-baseline gap-2">
                       <p className="truncate text-sm font-semibold text-ink">
                         {title}
                       </p>
                       {unread > 0 && (
-                        <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-warm-500 px-1 text-[9px] font-bold text-white">
+                        <span className="flex h-4 min-w-4 shrink-0 items-center justify-center rounded-full bg-warm-500 px-1 text-[9px] font-bold text-white">
                           {unread}
                         </span>
                       )}
+                      <span className="ml-auto shrink-0 text-[10px] text-ink/40">
+                        {timeAgo(last?.sentAt ?? app.appliedAt)}
+                      </span>
                     </div>
                     <p className="truncate text-xs text-ink/55">{sub}</p>
+                    <p className="truncate text-xs text-ink/45">
+                      {last
+                        ? `${last.senderRole === role ? "You: " : ""}${last.text}`
+                        : "No replies yet"}
+                    </p>
                   </div>
                 </button>
               </li>
@@ -190,7 +210,7 @@ export function MessagesInbox({ role }: { role: Role }) {
                   setActiveId(null);
                   setSearchParams({});
                 }}
-                className="rounded-lg px-2 py-1 text-sm text-brand-600 md:hidden"
+                className="rounded-lg px-2 py-1 text-sm text-brand-600 dark:text-brand-400 md:hidden"
               >
                 &larr; Back
               </button>
