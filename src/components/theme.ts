@@ -45,6 +45,34 @@ export const toneTile: Record<Tone, string> = {
   warm: "bg-warm-100 text-warm-600 dark:bg-warm-500/15 dark:text-warm-300",
 };
 
+/**
+ * Accent text color for large figures, eyebrows, and slide headings.
+ *
+ * Presentation surfaces need the tone's color without a chip's fill, so this
+ * lives beside `toneChip`/`toneTile` rather than being re-derived at each
+ * call site.
+ */
+export const toneText: Record<Tone, string> = {
+  neutral: "text-ink/60",
+  brand: "text-brand-600 dark:text-brand-400",
+  emerald: "text-emerald-600 dark:text-emerald-400",
+  blue: "text-blue-600 dark:text-blue-400",
+  violet: "text-violet-600 dark:text-violet-400",
+  amber: "text-amber-600 dark:text-amber-400",
+  warm: "text-warm-600 dark:text-warm-400",
+};
+
+/** Solid accent fill for progress bars, rules, and step markers. */
+export const toneBar: Record<Tone, string> = {
+  neutral: "bg-ink/30",
+  brand: "bg-brand-600",
+  emerald: "bg-emerald-500",
+  blue: "bg-blue-500",
+  violet: "bg-violet-500",
+  amber: "bg-amber-500",
+  warm: "bg-warm-500",
+};
+
 export const jobTypeTone: Record<JobType, Tone> = {
   "full-time": "brand",
   "part-time": "blue",

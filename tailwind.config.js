@@ -53,10 +53,26 @@ export default {
           "70%": { boxShadow: "0 0 0 10px rgba(234, 88, 12, 0)" },
           "100%": { boxShadow: "0 0 0 0 rgba(234, 88, 12, 0)" },
         },
+        // Direction-aware slide transitions for the presentation deck.
+        "slide-in-right": {
+          "0%": { opacity: "0", transform: "translate3d(4%, 0, 0)" },
+          "100%": { opacity: "1", transform: "translate3d(0, 0, 0)" },
+        },
+        "slide-in-left": {
+          "0%": { opacity: "0", transform: "translate3d(-4%, 0, 0)" },
+          "100%": { opacity: "1", transform: "translate3d(0, 0, 0)" },
+        },
+        "rise-in": {
+          "0%": { opacity: "0", transform: "translate3d(0, 12px, 0) scale(0.99)" },
+          "100%": { opacity: "1", transform: "translate3d(0, 0, 0) scale(1)" },
+        },
       },
       animation: {
         "fade-in": "fade-in 0.35s ease-out",
         "pulse-ring": "pulse-ring 2s infinite",
+        "slide-in-right": "slide-in-right 0.4s cubic-bezier(0.22, 1, 0.36, 1)",
+        "slide-in-left": "slide-in-left 0.4s cubic-bezier(0.22, 1, 0.36, 1)",
+        "rise-in": "rise-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both",
       },
     },
   },

@@ -76,6 +76,67 @@
   .chip {
     @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium;
   }
+
+  /*
+   * Presentation deck typography.
+   *
+   * Slides have to read from a laptop, a phone, and a projector at
+   * fullscreen, so type scales with the viewport rather than stepping
+   * through fixed breakpoints.
+   */
+  .slide-eyebrow {
+    @apply font-semibold uppercase tracking-[0.18em];
+    font-size: clamp(0.62rem, 0.85vw, 0.82rem);
+  }
+
+  .slide-title {
+    @apply font-display font-bold tracking-tight;
+    font-size: clamp(1.5rem, 3.4vw, 3rem);
+    line-height: 1.08;
+  }
+
+  .slide-hero-title {
+    @apply font-display font-bold tracking-tight;
+    font-size: clamp(2.25rem, 6.4vw, 5.5rem);
+    line-height: 1;
+  }
+
+  .slide-subtitle {
+    font-size: clamp(0.9rem, 1.35vw, 1.3rem);
+    line-height: 1.5;
+  }
+
+  .slide-lead {
+    @apply font-semibold;
+    font-size: clamp(0.92rem, 1.2vw, 1.15rem);
+    line-height: 1.35;
+  }
+
+  .slide-body {
+    font-size: clamp(0.8rem, 1.02vw, 1rem);
+    line-height: 1.55;
+  }
+
+  .slide-fine {
+    font-size: clamp(0.68rem, 0.8vw, 0.82rem);
+    line-height: 1.5;
+  }
+
+  .slide-stat {
+    @apply font-display font-bold tracking-tight;
+    font-size: clamp(1.75rem, 3.6vw, 3.25rem);
+    line-height: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-slide-in-left,
+  .animate-slide-in-right,
+  .animate-rise-in,
+  .animate-pulse-ring {
+    animation: none !important;
+  }
 }
 
 ::-webkit-scrollbar {
