@@ -48,7 +48,7 @@ export default function JobBoard() {
   return (
     <div className="space-y-8">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wider text-brand-600">
+        <p className="text-xs font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">
           Caregiver dashboard
         </p>
         <h1 className="mt-1 font-display text-2xl font-bold text-ink sm:text-3xl">
@@ -69,7 +69,7 @@ export default function JobBoard() {
             <span className="flex h-8 w-8 animate-pulse-ring items-center justify-center rounded-full bg-warm-500 text-white">
               <BoltIcon width={18} height={18} />
             </span>
-            <h2 className="font-display text-lg font-bold text-warm-700">
+            <h2 className="font-display text-lg font-bold text-warm-700 dark:text-warm-400">
               Urgent fills — {urgent.length} need coverage now
             </h2>
           </div>

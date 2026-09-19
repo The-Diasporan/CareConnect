@@ -6,7 +6,12 @@ import { ChatIcon } from "../../components/icons";
 
 export default function OwnerReviews() {
   const { session, afhs, reviews } = useApp();
-  const ownedIds = session?.ownedAfhIds ?? [];
+  // `?? []` builds a fresh array on every render, which would invalidate
+  // every memo below it. Pin the identity to the session.
+  const ownedIds = useMemo(
+    () => session?.ownedAfhIds ?? [],
+    [session],
+  );
   const ownedAfhs = useMemo(
     () => afhs.filter((a) => ownedIds.includes(a.id)),
     [afhs, ownedIds],
@@ -33,7 +38,7 @@ export default function OwnerReviews() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wider text-warm-600">
+        <p className="text-xs font-semibold uppercase tracking-wider text-warm-600 dark:text-warm-400">
           Home owner dashboard
         </p>
         <h1 className="mt-1 font-display text-2xl font-bold text-ink sm:text-3xl">

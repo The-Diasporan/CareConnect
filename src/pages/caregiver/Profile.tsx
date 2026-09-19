@@ -49,7 +49,7 @@ export default function Profile() {
     return (
       <p className="text-sm text-ink/60">
         No profile found.{" "}
-        <Link to="/caregiver/jobs" className="text-brand-600">
+        <Link to="/caregiver/jobs" className="text-brand-600 dark:text-brand-400">
           Back to jobs
         </Link>
       </p>
@@ -81,7 +81,7 @@ export default function Profile() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wider text-brand-600">
+        <p className="text-xs font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">
           Caregiver dashboard
         </p>
         <h1 className="mt-1 font-display text-2xl font-bold text-ink sm:text-3xl">
@@ -101,7 +101,7 @@ export default function Profile() {
           <p className="text-sm text-ink/60">{title || profile.title}</p>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {profile.verified && (
-              <Chip className="bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300">
+              <Chip tone="brand">
                 Verified
               </Chip>
             )}

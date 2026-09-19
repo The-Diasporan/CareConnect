@@ -10,7 +10,12 @@ const shifts: Shift[] = ["Day", "Evening", "Overnight", "Weekend"];
 
 export default function PostJobs() {
   const { session, afhs, jobs, addJob, deleteJob } = useApp();
-  const ownedIds = session?.ownedAfhIds ?? [];
+  // `?? []` builds a fresh array on every render, which would invalidate
+  // every memo below it. Pin the identity to the session.
+  const ownedIds = useMemo(
+    () => session?.ownedAfhIds ?? [],
+    [session],
+  );
   const ownedAfhs = useMemo(
     () => afhs.filter((a) => ownedIds.includes(a.id)),
     [afhs, ownedIds],
@@ -60,7 +65,7 @@ export default function PostJobs() {
   return (
     <div className="space-y-7">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wider text-warm-600">
+        <p className="text-xs font-semibold uppercase tracking-wider text-warm-600 dark:text-warm-400">
           Home owner dashboard
         </p>
         <h1 className="mt-1 font-display text-2xl font-bold text-ink sm:text-3xl">
@@ -233,7 +238,7 @@ export default function PostJobs() {
             </button>
 
             {justPosted && (
-              <p className="flex items-center justify-center gap-1.5 rounded-xl bg-emerald-50 py-2.5 text-sm font-medium text-emerald-700">
+              <p className="flex items-center justify-center gap-1.5 rounded-xl bg-emerald-50 py-2.5 text-sm font-medium text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
                 <CheckIcon width={16} height={16} /> Posted! It's now live on the caregiver feed.
               </p>
             )}

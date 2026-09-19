@@ -42,7 +42,7 @@ export default function OwnerCaregivers() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wider text-warm-600">
+        <p className="text-xs font-semibold uppercase tracking-wider text-warm-600 dark:text-warm-400">
           Home owner dashboard
         </p>
         <h1 className="mt-1 font-display text-2xl font-bold text-ink sm:text-3xl">

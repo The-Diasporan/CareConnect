@@ -59,8 +59,11 @@ export default function HomeDetail() {
           }}
         />
         <div className="px-6 pb-6">
-          <div className="-mt-8 flex items-end gap-4">
-            <span className="rounded-2xl ring-4 ring-white">
+          <div className="flex items-end gap-4">
+            {/* Only the avatar overlaps the banner — pulling the whole row up
+                drags the heading onto the accent gradient, where dark `text-ink`
+                loses contrast in light mode. */}
+            <span className="-mt-8 rounded-2xl ring-4 ring-surface">
               <Avatar name={afh.name} color={afh.accentColor} size={64} />
             </span>
             <div className="pb-1">
@@ -84,7 +87,7 @@ export default function HomeDetail() {
 
           <div className="mt-4 flex flex-wrap gap-1.5">
             {afh.specialties.map((s) => (
-              <Chip key={s} className="bg-brand-50 text-brand-700">
+              <Chip key={s} tone="brand">
                 {s}
               </Chip>
             ))}
@@ -160,7 +163,7 @@ export default function HomeDetail() {
       </section>
 
       <p className="text-center text-sm text-ink/50">
-        Looking for more? <Link to="/caregiver/jobs" className="font-medium text-brand-600">Back to the job board</Link>
+        Looking for more? <Link to="/caregiver/jobs" className="font-medium text-brand-600 dark:text-brand-400">Back to the job board</Link>
       </p>
     </div>
   );

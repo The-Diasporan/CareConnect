@@ -2,7 +2,9 @@ import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useApp } from "../../store/AppContext";
 import { JobCard } from "../../components/cards";
-import { EmptyState, SectionHeading, StatusBadge, timeAgo } from "../../components/ui";
+import { EmptyState, SectionHeading, StatusBadge } from "../../components/ui";
+import { toneTile } from "../../components/theme";
+import { timeAgo } from "../../components/format";
 import { BookmarkIcon, MapPinIcon, SendIcon } from "../../components/icons";
 
 export default function Activity() {
@@ -18,7 +20,7 @@ export default function Activity() {
   return (
     <div className="space-y-8">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wider text-brand-600">
+        <p className="text-xs font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">
           Caregiver dashboard
         </p>
         <h1 className="mt-1 font-display text-2xl font-bold text-ink sm:text-3xl">
@@ -43,7 +45,7 @@ export default function Activity() {
               const afh = job ? getAfh(job.afhId) : undefined;
               return (
                 <article key={app.id} className="card flex items-center gap-4 p-4">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300">
+                  <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${toneTile.brand}`}>
                     <SendIcon width={18} height={18} />
                   </span>
                   <div className="min-w-0 flex-1">

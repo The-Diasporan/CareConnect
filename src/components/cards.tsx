@@ -4,16 +4,9 @@ import { Link } from "react-router-dom";
 import type { AFH, Caregiver, Job, Review } from "../types";
 import { useApp } from "../store/AppContext";
 import { ApplyModal } from "./ApplyModal";
-import {
-  APPLICATION_STATUSES,
-  Avatar,
-  Chip,
-  JobTypeChip,
-  StarRating,
-  StatusBadge,
-  statusText,
-  timeAgo,
-} from "./ui";
+import { Avatar, Chip, JobTypeChip, StarRating, StatusBadge } from "./ui";
+import { APPLICATION_STATUSES, statusText, toneChip, toneTile } from "./theme";
+import { timeAgo } from "./format";
 import type { Application, ApplicationStatus } from "../types";
 import {
   BoltIcon,
@@ -82,10 +75,10 @@ export function JobCard({
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <JobTypeChip type={job.jobType} />
-        <Chip className="bg-ink/5">
+        <Chip>
           <ClockIcon width={13} height={13} /> {job.hours}
         </Chip>
-        <Chip className="bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
+        <Chip tone="emerald">
           <DollarIcon width={13} height={13} /> ${job.payRate}/hr
         </Chip>
         <span className="ml-auto text-xs text-ink/40">{timeAgo(job.postedAt)}</span>
@@ -124,7 +117,7 @@ function JobCardActions({ job, afh }: { job: Job; afh?: AFH }) {
 
       {applied ? (
         <div className="ml-auto flex items-center gap-2">
-          <span className="chip bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
+          <span className={`chip ${toneChip.emerald}`}>
             <CheckIcon width={14} height={14} /> Applied
           </span>
           <button
@@ -161,7 +154,7 @@ export function JobManageCard({
     <article className="card flex items-center gap-4 p-4">
       <span
         className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
-          job.urgent ? "bg-warm-100 text-warm-600" : "bg-brand-50 text-brand-600"
+          job.urgent ? toneTile.warm : toneTile.brand
         }`}
       >
         {job.urgent ? <BoltIcon width={20} height={20} /> : <ClockIcon width={20} height={20} />}
@@ -177,7 +170,7 @@ export function JobManageCard({
       </div>
       <button
         onClick={onDelete}
-        className="rounded-lg p-2 text-ink/40 transition hover:bg-red-50 hover:text-red-600"
+        className="rounded-lg p-2 text-ink/40 transition hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400"
         aria-label={`Delete ${job.title}`}
         title="Remove posting"
       >
@@ -216,7 +209,7 @@ export function AfhCard({ afh, jobCount }: { afh: AFH; jobCount: number }) {
       </div>
       <div className="mt-4 flex items-center justify-between border-t border-line/5 pt-3 text-xs text-ink/55 dark:border-line/10">
         <span>{afh.beds} beds</span>
-        <span className="font-medium text-brand-600">
+        <span className="font-medium text-brand-600 dark:text-brand-400">
           {jobCount} open {jobCount === 1 ? "role" : "roles"} &rarr;
         </span>
       </div>
@@ -261,7 +254,7 @@ export function CaregiverCard({ caregiver }: { caregiver: Caregiver }) {
         </p>
         <div className="flex flex-wrap gap-1.5">
           {caregiver.certifications.map((c) => (
-            <Chip key={c} className="bg-brand-50 text-brand-700">
+            <Chip key={c} tone="brand">
               {c}
             </Chip>
           ))}
@@ -342,7 +335,7 @@ export function ApplicantCard({
       {caregiver && caregiver.certifications.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-1.5">
           {caregiver.certifications.slice(0, 4).map((c) => (
-            <Chip key={c} className="bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300">
+            <Chip key={c} tone="brand">
               {c}
             </Chip>
           ))}

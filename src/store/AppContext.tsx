@@ -33,25 +33,6 @@ import {
   seedReviews,
 } from "../data/seed";
 
-interface Session {
-  role: Role;
-  name: string;
-  ownedAfhIds: string[];
-  caregiverId: string | null;
-}
-
-interface AppState {
-  session: Session | null;
-  jobs: Job[];
-  afhs: AFH[];
-  reviews: Review[];
-  caregivers: Caregiver[];
-  applications: Application[];
-  savedJobIds: string[];
-  messages: Message[];
-  readState: ReadState;
-}
-
 interface AppContextValue extends AppState {
   theme: Theme;
   login: (role: Role) => void;
@@ -92,19 +73,19 @@ interface AppContextValue extends AppState {
   setTheme: (theme: Theme) => void;
 }
 
-const STORAGE_KEY = "careconnect.state.v3";
+import {
+  loadPersisted,
+  SCHEMA_VERSION,
+  SEED_IDS,
+  STORAGE_KEY,
+  type AppState,
+  type PersistedState,
+  type Session,
+} from "./persistence";
+
 const THEME_KEY = "careconnect.theme";
 
 const AppContext = createContext<AppContextValue | null>(null);
-
-function loadPersisted(): Partial<AppState> | null {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as Partial<AppState>) : null;
-  } catch {
-    return null;
-  }
-}
 
 function averageRating(reviews: Review[]): number {
   if (reviews.length === 0) return 0;
@@ -131,12 +112,16 @@ function readTheme(): Theme {
 }
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const persisted = loadPersisted();
+  // Read and reconcile the snapshot exactly once. Calling this in the component
+  // body re-parsed the whole blob on every provider render, and handed each
+  // `useMemo` below a brand-new object identity so none of them ever cached.
+  const [persisted] = useState(loadPersisted);
 
   const [session, setSession] = useState<Session | null>(
     persisted?.session ?? null,
   );
   const [jobs, setJobs] = useState<Job[]>(persisted?.jobs ?? seedJobs);
+  const [baseAfhs] = useState<AFH[]>(persisted?.afhs ?? seedAFHs);
   const [reviews, setReviews] = useState<Review[]>(
     persisted?.reviews ?? seedReviews,
   );
@@ -155,6 +140,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [readState, setReadState] = useState<ReadState>(
     persisted?.readState ?? seedReadState(),
   );
+  const [deletedSeedIds, setDeletedSeedIds] = useState<string[]>(
+    persisted?.deletedSeedIds ?? [],
+  );
   const [theme, setThemeState] = useState<Theme>(readTheme);
 
   useEffect(() => {
@@ -167,29 +155,33 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [theme]);
 
-  const afhs = useMemo<AFH[]>(() => {
-    const base = persisted?.afhs ?? seedAFHs;
-    return base.map((afh) => {
-      const afhReviews = reviews.filter((r) => r.afhId === afh.id);
-      return {
-        ...afh,
-        rating: afhReviews.length ? averageRating(afhReviews) : afh.rating,
-        reviewCount: afhReviews.length,
-      };
-    });
-  }, [reviews, persisted?.afhs]);
+  // Ratings are always derived from `reviews` so the two can't drift apart.
+  const afhs = useMemo<AFH[]>(
+    () =>
+      baseAfhs.map((afh) => {
+        const afhReviews = reviews.filter((r) => r.afhId === afh.id);
+        return {
+          ...afh,
+          rating: afhReviews.length ? averageRating(afhReviews) : afh.rating,
+          reviewCount: afhReviews.length,
+        };
+      }),
+    [reviews, baseAfhs],
+  );
 
   useEffect(() => {
-    const snapshot: AppState = {
+    const snapshot: PersistedState = {
+      version: SCHEMA_VERSION,
       session,
       jobs,
       reviews,
-      afhs,
+      afhs: baseAfhs,
       caregivers,
       applications,
       savedJobIds,
       messages,
       readState,
+      deletedSeedIds,
     };
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
@@ -200,12 +192,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     session,
     jobs,
     reviews,
-    afhs,
+    baseAfhs,
     caregivers,
     applications,
     savedJobIds,
     messages,
     readState,
+    deletedSeedIds,
   ]);
 
   const login = useCallback(
@@ -243,6 +236,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const deleteJob = useCallback((jobId: string) => {
     setJobs((prev) => prev.filter((j) => j.id !== jobId));
+    if (SEED_IDS.has(jobId)) {
+      setDeletedSeedIds((prev) =>
+        prev.includes(jobId) ? prev : [...prev, jobId],
+      );
+    }
   }, []);
 
   const addReview = useCallback((review: Omit<Review, "id" | "date">) => {
@@ -417,7 +415,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [savedJobIds],
   );
 
-  const myThreads = useCallback(() => {
+  // Memoized rather than recomputed per call: callers put the result straight
+  // into `useMemo`/`useEffect` dependency arrays, and a fresh array identity on
+  // every render meant those never cached and their effects re-ran constantly.
+  const threads = useMemo<Application[]>(() => {
     if (session?.role === "caregiver" && session.caregiverId) {
       return applications
         .filter((a) => a.caregiverId === session.caregiverId)
@@ -434,6 +435,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
     return [];
   }, [applications, jobs, session]);
+
+  const myThreads = useCallback(() => threads, [threads]);
 
   const messagesForApplication = useCallback(
     (applicationId: string) =>
@@ -511,7 +514,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const unreadMessageCount = useCallback(() => {
     if (!session) return 0;
-    const threads = myThreads();
     const threadIds = new Set(threads.map((t) => t.id));
     const readMap =
       session.role === "caregiver"
@@ -525,7 +527,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const lastRead = readMap[m.applicationId] ?? 0;
       return m.sentAt > lastRead;
     }).length;
-  }, [messages, myThreads, readState, session]);
+  }, [messages, threads, readState, session]);
 
   const navBadgeFor = useCallback(
     (path: string) => {
@@ -554,52 +556,104 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [],
   );
 
-  const value: AppContextValue = {
-    session,
-    jobs,
-    afhs,
-    reviews,
-    caregivers,
-    applications,
-    savedJobIds,
-    messages,
-    readState,
-    theme,
-    login,
-    logout,
-    switchRole,
-    addJob,
-    deleteJob,
-    addReview,
-    getAfh,
-    getCaregiver,
-    myCaregiverProfile,
-    updateMyProfile,
-    reviewsForAfh,
-    jobsForAfh,
-    applyToJob,
-    withdrawApplication,
-    hasApplied,
-    myApplications,
-    applicationsForOwner,
-    applicationsForJob,
-    getApplication,
-    updateApplicationStatus,
-    toggleSaveJob,
-    isSaved,
-    myThreads,
-    messagesForApplication,
-    sendMessage,
-    markThreadRead,
-    markJobsSeen,
-    markApplicantsSeen,
-    unreadUrgentJobCount,
-    unreadApplicantCount,
-    unreadMessageCount,
-    navBadgeFor,
-    toggleTheme,
-    setTheme,
-  };
+  // Memoized so a change to one slice of state does not re-render every
+  // consumer of the context through a fresh value object.
+  const value = useMemo<AppContextValue>(
+    () => ({
+      session,
+      jobs,
+      afhs,
+      reviews,
+      caregivers,
+      applications,
+      savedJobIds,
+      messages,
+      readState,
+      deletedSeedIds,
+      theme,
+      login,
+      logout,
+      switchRole,
+      addJob,
+      deleteJob,
+      addReview,
+      getAfh,
+      getCaregiver,
+      myCaregiverProfile,
+      updateMyProfile,
+      reviewsForAfh,
+      jobsForAfh,
+      applyToJob,
+      withdrawApplication,
+      hasApplied,
+      myApplications,
+      applicationsForOwner,
+      applicationsForJob,
+      getApplication,
+      updateApplicationStatus,
+      toggleSaveJob,
+      isSaved,
+      myThreads,
+      messagesForApplication,
+      sendMessage,
+      markThreadRead,
+      markJobsSeen,
+      markApplicantsSeen,
+      unreadUrgentJobCount,
+      unreadApplicantCount,
+      unreadMessageCount,
+      navBadgeFor,
+      toggleTheme,
+      setTheme,
+    }),
+    [
+      session,
+      jobs,
+      afhs,
+      reviews,
+      caregivers,
+      applications,
+      savedJobIds,
+      messages,
+      readState,
+      deletedSeedIds,
+      theme,
+      login,
+      logout,
+      switchRole,
+      addJob,
+      deleteJob,
+      addReview,
+      getAfh,
+      getCaregiver,
+      myCaregiverProfile,
+      updateMyProfile,
+      reviewsForAfh,
+      jobsForAfh,
+      applyToJob,
+      withdrawApplication,
+      hasApplied,
+      myApplications,
+      applicationsForOwner,
+      applicationsForJob,
+      getApplication,
+      updateApplicationStatus,
+      toggleSaveJob,
+      isSaved,
+      myThreads,
+      messagesForApplication,
+      sendMessage,
+      markThreadRead,
+      markJobsSeen,
+      markApplicantsSeen,
+      unreadUrgentJobCount,
+      unreadApplicantCount,
+      unreadMessageCount,
+      navBadgeFor,
+      toggleTheme,
+      setTheme,
+    ],
+  );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }

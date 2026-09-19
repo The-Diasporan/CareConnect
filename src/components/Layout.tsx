@@ -54,7 +54,7 @@ function NavItemLink({
         to={item.to}
         className={({ isActive }) =>
           `relative flex flex-1 flex-col items-center gap-1 py-2.5 text-[10px] font-medium transition ${
-            isActive ? "text-brand-600" : "text-ink/50"
+            isActive ? "text-brand-600 dark:text-brand-400" : "text-ink/50"
           }`
         }
       >
@@ -97,7 +97,7 @@ export function Brand({ compact = false }: { compact?: boolean }) {
       </span>
       {!compact && (
         <span className="font-display text-lg font-bold text-ink">
-          Care<span className="text-brand-600">Connect</span>
+          Care<span className="text-brand-600 dark:text-brand-400">Connect</span>
         </span>
       )}
     </div>
