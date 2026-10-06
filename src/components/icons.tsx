@@ -185,3 +185,99 @@ export const UserIcon = (p: IconProps) => (
     <path d="M5 20a7 7 0 0 1 14 0" />
   </svg>
 );
+
+export const SlidesIcon = (p: IconProps) => (
+  <svg {...base} {...p}>
+    <rect x="3" y="4" width="18" height="12" rx="2" />
+    <path d="M12 16v4m-3 0h6" />
+  </svg>
+);
+
+export const ChevronLeftIcon = (p: IconProps) => (
+  <svg {...base} {...p}>
+    <path d="m14.5 5-6 7 6 7" />
+  </svg>
+);
+
+export const ChevronRightIcon = (p: IconProps) => (
+  <svg {...base} {...p}>
+    <path d="m9.5 5 6 7-6 7" />
+  </svg>
+);
+
+export const GridIcon = (p: IconProps) => (
+  <svg {...base} {...p}>
+    <rect x="3.5" y="3.5" width="7" height="7" rx="1.5" />
+    <rect x="13.5" y="3.5" width="7" height="7" rx="1.5" />
+    <rect x="3.5" y="13.5" width="7" height="7" rx="1.5" />
+    <rect x="13.5" y="13.5" width="7" height="7" rx="1.5" />
+  </svg>
+);
+
+export const NoteIcon = (p: IconProps) => (
+  <svg {...base} {...p}>
+    <path d="M6 3h9l4 4v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" />
+    <path d="M14 3v5h5M8.5 13h7M8.5 17h4.5" />
+  </svg>
+);
+
+export const ExpandIcon = (p: IconProps) => (
+  <svg {...base} {...p}>
+    <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />
+  </svg>
+);
+
+export const CollapseIcon = (p: IconProps) => (
+  <svg {...base} {...p}>
+    <path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" />
+  </svg>
+);
+
+export const TrendingUpIcon = (p: IconProps) => (
+  <svg {...base} {...p}>
+    <path d="m3 16 5.5-5.5 3.5 3.5L21 5" />
+    <path d="M15 5h6v6" />
+  </svg>
+);
+
+export const TargetIcon = (p: IconProps) => (
+  <svg {...base} {...p}>
+    <circle cx="12" cy="12" r="8.5" />
+    <circle cx="12" cy="12" r="4.5" />
+    <circle cx="12" cy="12" r="1" fill="currentColor" />
+  </svg>
+);
+
+export const GlobeIcon = (p: IconProps) => (
+  <svg {...base} {...p}>
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="M3.5 12h17M12 3.5c2.2 2.3 3.4 5.3 3.4 8.5S14.2 18.2 12 20.5c-2.2-2.3-3.4-5.3-3.4-8.5S9.8 5.8 12 3.5Z" />
+  </svg>
+);
+
+export const SparkleIcon = (p: IconProps) => (
+  <svg {...base} {...p}>
+    <path d="M12 3.5 13.8 9 19 10.8 13.8 12.6 12 18l-1.8-5.4L5 10.8 10.2 9Z" />
+    <path d="M18.5 16.5 19.2 18.4 21 19l-1.8.7-.7 1.8-.7-1.8L16 19l1.8-.6Z" />
+  </svg>
+);
+
+export const SyncIcon = (p: IconProps) => (
+  <svg {...base} {...p}>
+    <path d="M20 11a8 8 0 0 0-13.7-5.2L3 9" />
+    <path d="M4 13a8 8 0 0 0 13.7 5.2L21 15" />
+    <path d="M3 4v5h5M21 20v-5h-5" />
+  </svg>
+);
+
+export const PlayIcon = (p: IconProps) => (
+  <svg {...base} fill="currentColor" stroke="none" {...p}>
+    <path d="M8 5.5v13l11-6.5Z" />
+  </svg>
+);
+
+export const PauseIcon = (p: IconProps) => (
+  <svg {...base} fill="currentColor" stroke="none" {...p}>
+    <path d="M8 5h3v14H8zM13 5h3v14h-3z" />
+  </svg>
+);

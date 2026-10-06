@@ -11,6 +11,7 @@ import {
   HeartHandIcon,
   HomeIcon,
   ShieldIcon,
+  SlidesIcon,
   StarIcon,
   UsersIcon,
 } from "../components/icons";
@@ -83,6 +84,14 @@ export default function Landing() {
         <Brand />
         <div className="flex items-center gap-2">
           <ThemeToggle />
+          <Link
+            to="/slides"
+            className="btn-ghost hidden text-sm sm:inline-flex"
+            title="Investor pitch & product demo decks"
+          >
+            <SlidesIcon width={18} height={18} />
+            Presentation Decks
+          </Link>
           <Link to="/login" className="btn-secondary text-sm">
             Sign in
           </Link>
@@ -120,6 +129,15 @@ export default function Landing() {
               <HomeIcon width={18} height={18} /> I'm a Home Owner
             </button>
           </div>
+
+          <Link
+            to="/slides"
+            className="chip mx-auto mt-6 w-fit bg-surface text-ink/70 shadow-card ring-1 ring-line/10 transition hover:text-ink hover:shadow-soft dark:ring-line/15"
+          >
+            <SlidesIcon width={14} height={14} />
+            View the investor pitch &amp; product demo decks
+            <ArrowRightIcon width={14} height={14} />
+          </Link>
 
           <div className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-ink/55">
             <span className="flex items-center gap-1.5">

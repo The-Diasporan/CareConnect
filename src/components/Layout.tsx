@@ -13,6 +13,7 @@ import {
   InboxIcon,
   LogoutIcon,
   SendIcon,
+  SlidesIcon,
   UserIcon,
   UsersIcon,
 } from "./icons";
@@ -30,6 +31,13 @@ const caregiverNav: NavItem[] = [
   { to: "/caregiver/messages", label: "Messages", icon: ChatIcon },
   { to: "/caregiver/profile", label: "Profile", icon: UserIcon },
 ];
+
+/** Public presentation decks — reachable from either role's dashboard. */
+const slidesNav: NavItem = {
+  to: "/slides",
+  label: "Slide Decks",
+  icon: SlidesIcon,
+};
 
 const ownerNav: NavItem[] = [
   { to: "/owner/jobs", label: "My Jobs", icon: BriefcaseIcon },
@@ -112,7 +120,7 @@ export function Layout({ children }: { children: ReactNode }) {
   if (!session) return null;
 
   const isOwner = session.role === "owner";
-  const navItems = isOwner ? ownerNav : caregiverNav;
+  const navItems = [...(isOwner ? ownerNav : caregiverNav), slidesNav];
   const profile = !isOwner ? myCaregiverProfile() : undefined;
 
   const handleSwitch = () => {

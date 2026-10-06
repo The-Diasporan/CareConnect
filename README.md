@@ -13,6 +13,7 @@ Built with **Vite + React + TypeScript + Tailwind CSS**.
 - **Light / Dark mode toggle** available everywhere (landing, login, both dashboards). Theme is driven by CSS variables so every element stays readable in both modes, persists in `localStorage`, respects the OS preference, and applies before first paint (no flash).
 - **Responsive, mobile-first UI** — sidebar on desktop, bottom tab bar on phones.
 - **Persistent state** via `localStorage`, so posted jobs, applications, bookmarks, and reviews survive refreshes.
+- **Presentation decks** at `/slides` — an interactive investor pitch deck and product/client demo deck built into the app (see below).
 
 ### Role 1 — Caregiver Dashboard
 - **Job Board feed** of available roles with filters for full-time, part-time, and shift-based work, plus keyword search.
@@ -49,10 +50,58 @@ Open the printed URL (default http://localhost:5173). It's demo mode — just pi
 - `npm run dev` — start the dev server
 - `npm run build` — type-check and build for production
 - `npm run preview` — preview the production build
+- `npm run docs:decks` — regenerate `docs/presentation-decks.md` from the slide data
 - `npm run lint` — ESLint (flat config, TypeScript + React Hooks rules)
 - `npm test` — run the Vitest suite once
 - `npm run test:watch` — Vitest in watch mode
 - `npm run coverage` — test run with a V8 coverage report
+
+## Presentation decks
+
+Two ready-to-present decks ship with the app at **`/slides`** (public — no login
+required), reachable from the landing page and from the sidebar of either
+dashboard:
+
+| Deck | Slides | Focus |
+| --- | --- | --- |
+| **Investor Pitch** | 10 | Market size, the AFH staffing crisis, the dual-sided marketplace, the urgent fill engine, business model, moat, and the ask |
+| **Product & Client Demo** | 10 | Caregiver and owner walkthroughs, urgent fill workflow, applicant pipeline, messaging, verification, reviews, and onboarding |
+
+The viewer supports deck switching, light/dark mode, slide transitions, a slide
+picker grid, and a presenter mode with the talk track, visual cue, a rehearsal
+timer, and an up-next preview.
+
+| Key | Action |
+| --- | --- |
+| `←` / `→` / `Space` | Previous / next slide |
+| `Home` / `End` | First / last slide |
+| `F` | Fullscreen |
+| `N` | Presenter notes |
+| `G` | Slide picker grid |
+| `D` | Switch decks |
+| `Esc` | Close an overlay or leave fullscreen |
+
+Any position is linkable: `/slides?deck=product&slide=5`. On touch devices,
+swipe left or right.
+
+### Editing slide content
+
+All copy, figures, speaker notes, and visual cues live in
+**`src/data/slideData.ts`** as plain data — no JSX. Slides are a discriminated
+union over six layouts (`hero`, `split`, `grid`, `stats`, `flow`, `closing`), so
+adding a layout forces every renderer to handle it.
+
+`docs/presentation-decks.md` is the same content as a written document and is
+**generated** from that file. After editing slide data, run:
+
+```bash
+npm run docs:decks
+```
+
+> The market and unit-economics figures in the investor deck are directional
+> placeholders for the pitch narrative. Confirm the sourcing for every figure
+> (they are listed together in the appendix of the generated document) before
+> sharing either deck externally.
 
 ## Security note
 
@@ -68,7 +117,8 @@ Anything real would need the role check repeated server-side on every request.
 src/
   components/    # Layout, cards, ApplyModal, ThemeToggle, UI primitives, icons
   data/seed.ts   # Realistic healthcare placeholder data (homes, jobs, caregivers, reviews, applications)
-  pages/         # Landing, Login, caregiver/* and owner/* dashboards
+  data/slideData.ts # Investor & product deck content (copy, figures, speaker notes)
+  pages/         # Landing, Login, SlideDeck, caregiver/* and owner/* dashboards
   components/
     theme.ts     # Tone palette — every accent's light AND dark classes
     format.ts    # timeAgo and other display formatting
@@ -76,6 +126,10 @@ src/
     AppContext.tsx  # Shared application + theme state
     persistence.ts  # Snapshot schema, versioning, seed reconciliation
   types.ts       # Shared TypeScript types
+scripts/
+  generate-deck-docs.ts  # Renders docs/presentation-decks.md from slideData.ts
+docs/
+  presentation-decks.md  # Generated slide-by-slide deck document
 ```
 
 ### Styling rules

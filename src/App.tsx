@@ -5,6 +5,7 @@ import type { Role } from "./types";
 import { Layout } from "./components/Layout";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
+import SlideDeck from "./pages/SlideDeck";
 import JobBoard from "./pages/caregiver/JobBoard";
 import Homes from "./pages/caregiver/Homes";
 import HomeDetail from "./pages/caregiver/HomeDetail";
@@ -31,6 +32,8 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
+      {/* Public investor & client presentation decks */}
+      <Route path="/slides" element={<SlideDeck />} />
 
       {/* Caregiver (User 1) */}
       <Route
